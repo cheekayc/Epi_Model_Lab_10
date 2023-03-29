@@ -7,7 +7,7 @@
 library(deSolve)
 
 # sample code for the 2-age group model
-SIR2ageGrs <- function(t, state, parameters) {
+SIR2ageGrs = function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
     
     dSC = nu - SC * (betaCC * IC + betaCA * IA) - muC * SC - lC * SC
@@ -18,8 +18,6 @@ SIR2ageGrs <- function(t, state, parameters) {
     list(c(dSC, dIC, dSA, dIA))
   })
 }
-
-
 
 ## parameters/initial conditions 
 ## note all time units are in year here
@@ -39,23 +37,32 @@ nA = 0.8; # % adults = 1-nC;
 nu = 1/75; # birth rate, per year
 
 # initial susceptibility 
-SC0 = .1; # initial susceptibility in children 10%
-SA0 =.1; # initial susceptibility in adults 10%
+SC0 = 0.1; # initial susceptibility in children 10%
+SA0 = 0.1; # initial susceptibility in adults 10%
 # initial infectious:
-IC0 = .0001; # initial infection rate in children 
-IA0 = .0001; # initial infection rate in adults
+IC0 = 0.0001; # initial infection rate in children 
+IA0 = 0.0001; # initial infection rate in adults
 # initial recovered:
 RC0 = nC - IC0 - SC0; 
 RA0 = nA - IA0 - SA0; 
 
 ######  CODE ON YOUR OWN  ###### 
 ## to run the model, you will have to put all pieces (parameters, initial conditions, etc.) together. 
+
+# Parameters and initial conditions
+parameters = c(betaCC = betaCC, betaAA = betaAA, betaAC = betaCA, betaCA = betaCA, gamma = gamma, lC = lC, muC = muC, muA = muA, nu = nu)
+state = c(SC = SC0, IC = IC0, SA = SA0, IA = IA0)
+
+times = seq(0, 100, by = 1)
+  
 ## [Q1] Run the model using parameters/initial conditions listed in the next slide for 100 years.  
+sim = ode(y = state, times = times, func = SIR2ageGrs, parms = parameters)
+
 ## Plot the fraction of susceptibles (Si/ni) for the two groups. what do you find, which group has a higher susceptibility? Why? (1pt)
 
 
 ## SAMPLE CODE TO NORMALIZE THE PROPORTIONS RELATIVE TO THE SPECIFIC GROUP (VS THE ENTIRE POPULATION)
-if(F){
+if(F){ # Ignore this part because the susceptibility and infections are already in fraction.
   ## proportion susceptible in the two groups, i.e. Si/ni
   fSC=sim[,'SC']/nC; # note: it is normalized by population size in each group
   fSA=sim[,'SA']/nA;
@@ -67,17 +74,17 @@ if(F){
   
   ## plot # people infected
   totI=rowSums(sim[,c('IC','IA')]);  # total infectious
-  totS=rowSums(sim[,c('SC','SA')]);  # total susecptible
+  totS=rowSums(sim[,c('SC','SA')]);  # total susceptible
   
 }
-
-
-
 
 
 # [Q2] What is R0 for the entire population? What would the average age of infection be, given this R0 value and a life span of 75 yr? (0.5pt)
 # [Hint: use the same method we used for risk structured model, ignore death rate and aging rate]
 # [Q3] What is the force of infection for each of the two groups, when the disease / your simulation reaches equilibrium? (0.5pt)[Hint: What is the force of infection?]
+lambdaC =
+
+
 # [Q4] What is the force of infection for each of the two groups, given the parameters and initial state variables at the beginning of the simulation? (0.5pt)[Hint: What is the force of infection?]
 
 
