@@ -1,21 +1,20 @@
----
-title: "Lab Report 10"
-author: "Chee Kay Cheong"
-date: "2023-04-01"
-output: github_document
----
+Lab Report 10
+================
+Chee Kay Cheong
+2023-04-01
 
-```{r setup, message = FALSE, warning = FALSE}
+``` r
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(deSolve)
 ```
 
-### Q1: Run the model using parameters/initial conditions listed in the slides 8-9 for 100 years. Plot the fraction of susceptibles (Si/ni) for the two groups. 
+### Q1: Run the model using parameters/initial conditions listed in the slides 8-9 for 100 years. Plot the fraction of susceptibles (Si/ni) for the two groups.
 
 Two age groups model:
-```{r}
+
+``` r
 SIR2ageGrs = function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
     
@@ -30,7 +29,8 @@ SIR2ageGrs = function(t, state, parameters) {
 ```
 
 Parameters & initial conditions:
-```{r}
+
+``` r
 # Note all time units are in year here
 betaCC = 1100; # transmission rate among children per year
 betaCA = betaAC = 110;  # transmission rate between children and adults per year
@@ -65,22 +65,25 @@ times = seq(0, 100, by = 1)
 ```
 
 Run the model.
-```{r}
+
+``` r
 sim = ode(y = state, times = times, func = SIR2ageGrs, parms = parameters)
 ```
 
 Plot the fraction of susceptible (Si/ni) for the two groups
-```{r}
+
+``` r
 par(mfrow = c(2, 1), mar = c(3, 3, 1, 1), mgp = c(1.8, 0.5, 0))
   plot(sim[ , 'time'], sim[ , 'SC'], ylab = '% S', xlab = 'Time (year)', type = 'l', col = 'blue', lwd = 1)
   lines(sim[ , 'time'], sim[ , 'SA'], ylab = '% S', xlab = 'Time (year)', type = 'l', col = 'red', lwd = 1)
   legend('topright', cex = 0.9, seg.len = 0.8, legend = c('Children', 'Adults'), lty = c(1, 1), , lwd = c(2, 2), col = c('blue', 'red'), bty = 'n')
 ```
 
+![](Lab_Report_10_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-### Q2: What is $R_0$ for the entire population? What would the average age of infection be, given this $R_0$ value and a life span of 75 years? 
+### Q2: What is $R_0$ for the entire population? What would the average age of infection be, given this $R_0$ value and a life span of 75 years?
 
-```{r}
+``` r
 # set beta matrix
 beta = matrix(c(1100, 110, 110, 220), 2, 2) # the beta matrix
 nC = 0.2; nA = 0.8;
@@ -93,7 +96,18 @@ R.matrix = n.matrix %*% beta / gamma
 
 # to see the output of the eigen function:
 eigen(R.matrix)
+```
 
+    ## eigen() decomposition
+    ## $values
+    ## [1] 9.481394 5.707647
+    ## 
+    ## $vectors
+    ##           [,1]       [,2]
+    ## [1,] 0.6289602 -0.2952418
+    ## [2,] 0.7774375  0.9554226
+
+``` r
 # To find R0
 R0 = eigen(R.matrix)$values[1]
 
@@ -101,10 +115,9 @@ R0 = eigen(R.matrix)$values[1]
 A = 75/R0
 ```
 
-
 ### Q3: What is the force of infection for each of the two groups, when this disease (or the simulation here) reaches **equilibrium**?
 
-```{r}
+``` r
 # Force of infection for children group
 lambdaCe = ((1 - sim[100, 'SC'])/15) / sim[100, 'SC']
 
@@ -112,10 +125,9 @@ lambdaCe = ((1 - sim[100, 'SC'])/15) / sim[100, 'SC']
 lambdaAe = ((sim[100, 'SC'] - sim[100, 'SA'])/60) / sim[100, 'SA']
 ```
 
-
 ### Q4: What is the force of infection for each of the two groups, given the parameters and initial state variables **at the beginning of the simulation**?
 
-```{r}
+``` r
 # Force of infection for children group
 lambdaC = ((1 - sim[1, 'SC'])/15) / sim[1, 'SC']
 
@@ -123,13 +135,13 @@ lambdaC = ((1 - sim[1, 'SC'])/15) / sim[1, 'SC']
 lambdaA = ((sim[1, 'SC'] - sim[1, 'SA'])/60) / sim[1, 'SA'] 
 ```
 
-
 ## Part 2: Vaccination
 
 ### Q5: Code a model with 2 age groups and vaccination at birth.
 
 Two age groups model with vaccination at birth:
-```{r}
+
+``` r
 SIR2ageVac = function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
     
@@ -145,10 +157,11 @@ SIR2ageVac = function(t, state, parameters) {
 }
 ```
 
-### Q6: Test your model with *p = 0.5* and the same initial conditions & parameters as in Part 1. 
+### Q6: Test your model with *p = 0.5* and the same initial conditions & parameters as in Part 1.
 
 Parameters & initial conditions:
-```{r}
+
+``` r
 # Note all time units are in year here
 betaCC = 1100; # transmission rate among children per year
 betaCA = betaAC = 110;  # transmission rate between children and adults per year
@@ -184,17 +197,18 @@ times = seq(0, 100, by = 1)
 ```
 
 Run the model.
-```{r}
+
+``` r
 sim = ode(y = state, times = times, func = SIR2ageVac, parms = parameters)
 ```
 
 Plot the fraction of recovered/immune for the two groups.
-```{r}
+
+``` r
 par(mfrow = c(2, 1), mar = c(3, 3, 1, 1), mgp = c(1.8, 0.5, 0))
   plot(sim[ , 'time'], sim[ , 'RA'], ylab = '% R', ylim = c(0, 0.8), xlab = 'Time (year)', type = 'l', col = 'red', lwd = 1)
   lines(sim[ , 'time'], sim[ , 'RC'], ylab = '% R', xlab = 'Time (year)', type = 'l', col = 'blue', lwd = 1)
   legend('topright', cex = 0.9, seg.len = 0.8, legend = c('Adults', 'Children'), lty = c(1, 1), , lwd = c(2, 2), col = c('red', 'blue'), bty = 'n')
 ```
 
-
-   
+![](Lab_Report_10_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
